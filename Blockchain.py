@@ -2,7 +2,6 @@ import datetime
 import hashlib
 import json
 
-    
 class Block:
     def __init__(self, block_index, time_created, transactions, previous_hash, nonce ):
         self.block_index = block_index
