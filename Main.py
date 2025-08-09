@@ -20,4 +20,4 @@ def get_blockchain(data:str):
     if not blockchain.is_chain_valid():
         return _fastapi.HTTPException(status_code = 400,     
                                       detail = "Invalid Block")
-        blockchain = blockchain.blo
+        blockchain = blockchain.blo 
