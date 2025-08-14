@@ -2,7 +2,7 @@ import fastapi as _fastapi
 import Blockchain as blockchain
 
 
-blockchain = blockchain.Blockchain
+blockchain = blockchain.Blockchain()
 app = _fastapi.FastAPI()
 
 # Mining"
@@ -11,13 +11,13 @@ def mine_block(data:str):
     if not blockchain.is_chain_valid():
         return _fastapi.HTTPException(status_code = 400, 
                                       detail = "Invalid Block")
-    block= blockchain.mine(data = data)
-    
+    block= blockchain.mine_block(data = data)
     return block    
 
 @app.get('/blockchain')
 def get_blockchain(data:str):
     if not blockchain.is_chain_valid():
         return _fastapi.HTTPException(status_code = 400,     
-                                      detail = "Invalid Block")
-        chain = blockchain.chain
+                                      detail = "Invalid Blockchain")
+    chain = blockchain.chain
+    return chain
