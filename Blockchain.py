@@ -48,8 +48,8 @@ class Blockchain:
     def __init__(self):
         self.chain = []
         # self.pending_transaction = [] # Store blocks that are pending for validation
-        genesis_block = self.create_block(data = "Test genesis", proof = 1, previous_hash="0", index = 0)
-        self.chain.append(genesis_block)
+        self.create_block(data = "Test genesis", proof = 1, previous_hash="0", index = 0)
+
     
 
     def to_digest(self, new_proof: int, previous_proof: int, index: str, data: str) -> bytes:
@@ -68,18 +68,20 @@ class Blockchain:
         return to_digest.encode()
     
     # Proof of work
-    def proof_of_work(self, previous_proof: str, index: int, data: str) -> dict:
+    def proof_of_work(self, previous_proof: int, index: int, data: str) -> int:
         new_proof = 1
         check_proof = False
-        
+
         while not check_proof:
-            print(new_proof)
-            to_digest = self.to_digest(new_proof= new_proof, 
-                                       previous_proof=previous_proof,
-                                       index=index, 
-                                       data=data)
+            # print(new_proof)  # optional: uncomment to watch mining progress
+            to_digest = self.to_digest(
+                new_proof=new_proof,
+                previous_proof=previous_proof,
+                index=index,
+                data=data,
+            )
             hash_value = hashlib.sha256(to_digest).hexdigest()
-            if hash_value[:4] == "0000": # Bigger the value the more time it will take to find this proof
+            if hash_value[:4] == "0000":  # Bigger the value the more time it will take to find this proof
                 check_proof = True
             else:
                 new_proof += 1
@@ -100,25 +102,26 @@ class Blockchain:
         
             
     # ---- Block ----
-    def mine_block(self, data: str) -> dict: 
+    def mine_block(self, data: str) -> dict:
         previous_block = self.get_previous_block()
         previous_proof = previous_block["proof"]
-        index = len(self.chain) + 1
+        index = previous_block["index"] + 1      # <-- was len(self.chain) + 1
         proof = self.proof_of_work(previous_proof, index, data)
-        previous_hash = self.hash_value(block = previous_block)
-        block = self.create_block(data= data, proof = proof, previous_hash=previous_hash, index = index)
-        self.chain.append(block)
+        previous_hash = self.hash_value(previous_block)
+        block = self.create_block(data=data, proof=proof,
+                                previous_hash=previous_hash, index=index)
         return block
+
     
     # Create block
-    def create_block(self, data:str, proof: int, previous_hash: str, index: int) -> dict:
+    def create_block(self, data: str, proof: int, previous_hash: str, index: int) -> dict:
         block = {
-            'index': index,
-            'timestamp': str(datetime.datetime.now()),
-            'date: ': data,
+            "index": index,
+            "timestamp": str(datetime.datetime.now()),
+            "data": data,
             # 'transactions': [tx.to_dict() for tx in self.pending_transactions],
-            'proof': proof,
-            'previous_hash': previous_hash
+            "proof": proof,
+            "previous_hash": previous_hash,
         }
         self.pending_transactions = []  # clear the pool after mining
         self.chain.append(block)
@@ -129,26 +132,33 @@ class Blockchain:
         return self.chain[-1] 
     
     # Chain integreity 
-    def is_chain_valid(self, chain):
-        previous_block = chain[0]
+    def is_chain_valid(self) -> bool: ## Job is to make sure that the chain is still valid and no alteration been made
+        """  """
+        previous_block = self.chain[0]
         block_index = 1
 
-        while block_index < len(chain):
-            block = chain[block_index]
-            if block['previous_hash'] != self.hash(previous_block):
+        while block_index < len(self.chain):
+            block = self.chain[block_index]
+            if block['previous_hash'] != self.hash_value(previous_block):
                 return False
 
-            previous_proof = previous_block['proof']
-            proof = block['proof']
-            hash_operation = hashlib.sha256(
-                str(proof**2 - previous_proof**2).encode()).hexdigest()
-
-            if hash_operation[:5] != '00000':
+            current_proof = previous_block['proof']
+            next_index, next_data , next_proof = (
+                block["index"],
+                block["data"],
+                block["proof"],
+            )
+            hash_value = hashlib.sha256(self.to_digest(new_proof=next_proof, previous_proof=current_proof, 
+                                                       index = next_index, data = next_data)).hexdigest()
+            if hash_value[:4] != "0000":
                 return False
+            
             previous_block = block
-            block_index += 1
-
+            block_index +=1
+        
         return True
+            
+              
     
     # ---- Transactions ----
     def insert_transaction(self,transaction):

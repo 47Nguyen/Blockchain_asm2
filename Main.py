@@ -6,7 +6,7 @@ blockchain = blockchain.Blockchain
 app = _fastapi.FastAPI()
 
 # Mining"
-@app.post('/mine_block')
+@app.post('/mine_block/')
 def mine_block(data:str):
     if not blockchain.is_chain_valid():
         return _fastapi.HTTPException(status_code = 400, 
@@ -15,8 +15,9 @@ def mine_block(data:str):
     
     return block    
 
-@app.get('/get_blockchain')
+@app.get('/blockchain')
 def get_blockchain(data:str):
     if not blockchain.is_chain_valid():
         return _fastapi.HTTPException(status_code = 400,     
                                       detail = "Invalid Block")
+        chain = blockchain.chain
