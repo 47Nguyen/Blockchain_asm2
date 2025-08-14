@@ -1,0 +1,16 @@
+[
+    {
+        "index": 0,
+        "timestamp": "2025-08-14 22:24:55.326000",
+        "data": "Test genesis",
+        "proof": 1,
+        "previous_hash": "0"
+    },
+    {
+        "index": 1,
+        "timestamp": "2025-08-14 22:25:09.982162",
+        "data": "1",
+        "proof": 3952,
+        "previous_hash": "de3cf1f0812c802d3e7cd2a4a7b7d96c68671b65e9e8452717c711424c4e4f78"
+    }
+]

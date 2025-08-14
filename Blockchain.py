@@ -37,6 +37,7 @@ class Transactions:
             _type_: _description_
         """
         return {
+            "Ids" : self.ids,
             "Sender: ": self.sender,
             "Receiver: ": self.receiver,
             "Transaction amount: ": self.data,
@@ -159,21 +160,58 @@ class Blockchain:
         return True
             
               
-    
+    # ---- Data Persistence ----
+    # Save Blockchain
+    def save_chain(self):
+        with open("blockchain.json", "w") as f:
+            json.dump(self.chain, f , indent=4)
+
+    # Load block chain
+    def load_chain(self):
+        
+         with open("blockchain.json", "r") as f:
+             self.chain = json.load(f)
+
     # ---- Transactions ----
-    def insert_transaction(self,transaction):
-        if self.validate_transaction(transaction):
-            self.pending_transaction.append(transaction)
-            return True
-        else:
-            return False
+    def check_transactions(self, tx_id: str) -> bool: # Check for duplication transactions_id
+        """ Double spend-prevention """
+        if not tx_id:
+            return False # No tx exists
         
-    def validate_transaction(self, transaction):
-        if not isinstance (transaction, Transactions):
-            return False
-        
-        if not transaction.sender or not transaction.receiver or transaction.data is None:
-            return False
-        return True
+        for transactions in self.pending_transactions:
+            if transactions.get("id") == tx_id:
+                return True
+        for block in self.chain:
+            for transactions in block.get("transactions", []):
+                if transactions.get("id") == tx_id:
+                    return True
+        return False
     
-  
+    def insert_transaction(self, transaction: Transactions) -> bool:
+        """Insert a transaction object into the mempool if valid."""
+        if not isinstance(transaction, Transactions):
+            return False
+
+        tx = transaction.to_dict()
+
+        if not self.validate_transaction(tx):
+            return False
+
+        if self._tx_exists(tx["id"]):
+            return False
+
+        self.pending_transactions.append(tx)
+        return True
+
+    def validate_transaction(self, tx: dict) -> bool:
+        """Check fields are present and amount is valid."""
+        sender = tx.get("sender")
+        receiver = tx.get("receiver")
+        amount = tx.get("amount")
+
+        if not sender or not receiver or amount is None:
+            return False
+        try:
+            return float(amount) >= 0
+        except (TypeError, ValueError):
+            return False
