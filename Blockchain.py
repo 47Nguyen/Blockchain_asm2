@@ -24,11 +24,11 @@ class Transactions:
     """
     User transactions amount
     """
-    def __init__(self, transaction_id, sender, receiver, data):
+    def __init__(self, transaction_id, sender, receiver, amount):
         self.ids = transaction_id
         self.sender = sender
         self.receiver = receiver
-        self.data = data
+        self.amount = amount
     
     def to_dict(self):
         """_summary_
@@ -37,10 +37,10 @@ class Transactions:
             _type_: _description_
         """
         return {
-            "Ids" : self.ids,
-            "Sender: ": self.sender,
-            "Receiver: ": self.receiver,
-            "Transaction amount: ": self.data,
+            "id": self.ids,
+            "sender": self.sender,
+            "receiver": self.receiver,
+            "amount": self.amount,
         }
         
 
@@ -48,10 +48,21 @@ class Blockchain:
     # This class will store data which a normal blockchain should have
     def __init__(self):
         self.chain = []
-        # self.pending_transaction = [] # Store blocks that are pending for validation
-        self.create_block(data = "Test genesis", proof = 1, previous_hash="0", index = 0)
+        self.pending_transactions = []
 
-    
+        # 🔹 Create Genesis Block with funded accounts
+        genesis_txs = [
+            {"id": "genesis1", "sender": "SYSTEM", "receiver": "Alice", "amount": 100},
+            {"id": "genesis2", "sender": "SYSTEM", "receiver": "Bob", "amount": 50},
+        ]
+        self.create_block(
+            data="Genesis Block",
+            proof=1,
+            previous_hash="0",
+            index=0,
+        )
+        # Store genesis transactions inside the first block
+        self.chain[0]["transactions"] = genesis_txs
 
     def to_digest(self, new_proof: int, previous_proof: int, index: str, data: str) -> bytes:
         """
@@ -120,7 +131,7 @@ class Blockchain:
             "index": index,
             "timestamp": str(datetime.datetime.now()),
             "data": data,
-            # 'transactions': [tx.to_dict() for tx in self.pending_transactions],
+            "transactions": self.pending_transactions.copy(),   # include txs here
             "proof": proof,
             "previous_hash": previous_hash,
         }
@@ -160,7 +171,7 @@ class Blockchain:
         return True
             
               
-    # ---- Data Persistence ----
+    # ---- DATA PERSISTENCE ----
     # Save Blockchain
     def save_chain(self):
         with open("blockchain.json", "w") as f:
@@ -168,11 +179,39 @@ class Blockchain:
 
     # Load block chain
     def load_chain(self):
-        
          with open("blockchain.json", "r") as f:
              self.chain = json.load(f)
 
-    # ---- Transactions ----
+
+    # ---- TRANSACTIONS ----
+    def get_balance(self, user: str) -> float:
+        balance = 0.0
+
+        # Confirmed transactions
+        for block in self.chain:
+            for tx in block["transactions"]:
+                sender = tx.get("sender")
+                receiver = tx.get("receiver")
+                amount = tx.get("amount", 0)  
+
+                if sender == user:
+                    balance -= amount
+                if receiver == user:
+                    balance += amount
+
+        # Pending transactions
+        for tx in self.pending_transactions:
+            sender = tx.get("sender")
+            receiver = tx.get("receiver")
+            amount = tx.get("amount", 0)
+
+            if sender == user:
+                balance -= amount
+            if receiver == user:
+                balance += amount
+
+        return balance
+    
     def check_transactions(self, tx_id: str) -> bool: # Check for duplication transactions_id
         """ Double spend-prevention """
         if not tx_id:
@@ -187,8 +226,10 @@ class Blockchain:
                     return True
         return False
     
-    def insert_transaction(self, transaction: Transactions) -> bool:
-        """Insert a transaction object into the mempool if valid."""
+    def _tx_exists(self, tx_id: str) -> bool:
+        return self.check_transactions(tx_id)
+
+    def insert_transaction(self, transaction: Transactions) -> bool: # Use AI
         if not isinstance(transaction, Transactions):
             return False
 
@@ -201,17 +242,28 @@ class Blockchain:
             return False
 
         self.pending_transactions.append(tx)
+
         return True
 
     def validate_transaction(self, tx: dict) -> bool:
-        """Check fields are present and amount is valid."""
         sender = tx.get("sender")
         receiver = tx.get("receiver")
         amount = tx.get("amount")
 
         if not sender or not receiver or amount is None:
             return False
+
         try:
-            return float(amount) >= 0
+            amount = float(amount)
         except (TypeError, ValueError):
             return False
+
+        if amount < 0:
+            return False
+
+        if sender != "SYSTEM":  # Allow mining rewards or system tx
+            balance = self.get_balance(sender)
+            if amount > balance:
+                return False
+
+        return True

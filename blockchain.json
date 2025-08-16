@@ -1,16 +1,38 @@
 [
     {
         "index": 0,
-        "timestamp": "2025-08-14 22:24:55.326000",
-        "data": "Test genesis",
+        "timestamp": "2025-08-16 19:01:35.129354",
+        "data": "Genesis Block",
+        "transactions": [
+            {
+                "id": "genesis1",
+                "sender": "SYSTEM",
+                "receiver": "Alice",
+                "amount": 100
+            },
+            {
+                "id": "genesis2",
+                "sender": "SYSTEM",
+                "receiver": "Bob",
+                "amount": 50
+            }
+        ],
         "proof": 1,
         "previous_hash": "0"
     },
     {
         "index": 1,
-        "timestamp": "2025-08-14 22:25:09.982162",
-        "data": "1",
-        "proof": 3952,
-        "previous_hash": "de3cf1f0812c802d3e7cd2a4a7b7d96c68671b65e9e8452717c711424c4e4f78"
+        "timestamp": "2025-08-16 19:01:54.221429",
+        "data": "1st block",
+        "transactions": [
+            {
+                "id": "tx001",
+                "sender": "Alice",
+                "receiver": "Bob",
+                "amount": 100.0
+            }
+        ],
+        "proof": 4927,
+        "previous_hash": "839362108b4b4d00f7c31345297fa8cf2e032785cd9ab3b456d4abe7a0328aa9"
     }
 ]
