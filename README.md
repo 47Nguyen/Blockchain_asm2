@@ -3,6 +3,22 @@ Source:
 https://www.geeksforgeeks.org/python/create-simple-blockchain-using-python
 https://www.youtube.com/watch?v=G5M4bsxR-7E
 
+This project implements a simplified blockchain with the following features:
+- Transaction validation (prevents double spending)
+- Mining with Proof-of-Work consensus
+- Block creation and chain validation
+- RESTful API built with **FastAPI**
+- Interactive API documentation available via **Swagger UI*
+
+How to run:
+- You will need to install the require library for this. To that copy and paste the text below into your terminal.: 
+    - pip install -r requirements.txt 
+- After installing successfully.
+- To run:
+    - Go to terminal and paste in uvicorn main:app --reload 
+    - Wait for it to run a few secs, then this will show up http://127.0.0.1:8000/docs. 
+    - Copy and paste the link on to your browsers, you just click the link (don't worry the link is safe!!). 
+
 To do
 1. Block Structure [10 points] - DONE
     ○ Define a clear and robust block structure. Each block must contain at least:

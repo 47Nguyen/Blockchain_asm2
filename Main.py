@@ -1,20 +1,36 @@
-from fastapi import FastAPI, Form, HTTPException
-import fastapi as _fastapi
-from fastapi.responses import HTMLResponse
-from pydantic import BaseModel, Field
+from fastapi import FastAPI, Form, HTTPException # type: ignore
+import fastapi as _fastapi # type: ignore
+from fastapi.responses import HTMLResponse # type: ignore
+from pydantic import BaseModel # type: ignore
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
+
 from Blockchain import Transactions
 import Blockchain as blockchain
 
-
+#Set up
 blockchain = blockchain.Blockchain()
 app = _fastapi.FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+
+
+# Base Model
 class GetTransactions(BaseModel):
     id: str
     sender: str
     receiver: str
     amount: float
 
+
+@app.get("/")
+def read_me():
+    return "Please take a look at the README file."
 
 # Get all block
 @app.get("/blockchain")
