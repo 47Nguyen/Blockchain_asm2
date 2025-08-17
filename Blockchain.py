@@ -19,7 +19,6 @@ class Block:
             "previous_hash": self.previous_hash,
         }
         
-
 class Transactions:
     """
     User transactions amount
@@ -41,8 +40,7 @@ class Transactions:
             "sender": self.sender,
             "receiver": self.receiver,
             "amount": self.amount,
-        }
-        
+        }    
 
 class Blockchain: 
     # This class will store data which a normal blockchain should have
@@ -111,8 +109,7 @@ class Blockchain:
         """
         encoded_block = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
-        
-            
+              
     # ---- Block ----
     def mine_block(self, data: str) -> dict:
         previous_block = self.get_previous_block()
@@ -123,7 +120,6 @@ class Blockchain:
         block = self.create_block(data=data, proof=proof,
                                 previous_hash=previous_hash, index=index)
         return block
-
     
     # Create block
     def create_block(self, data: str, proof: int, previous_hash: str, index: int) -> dict:
@@ -168,8 +164,7 @@ class Blockchain:
             previous_block = block
             block_index +=1
         
-        return True
-            
+        return True 
               
     # ---- DATA PERSISTENCE ----
     # Save Blockchain
@@ -181,7 +176,6 @@ class Blockchain:
     def load_chain(self):
          with open("blockchain.json", "r") as f:
              self.chain = json.load(f)
-
 
     # ---- TRANSACTIONS ----
     def get_balance(self, user: str) -> float:
@@ -211,7 +205,7 @@ class Blockchain:
                 balance += amount
 
         return balance
-    
+
     def check_transactions(self, tx_id: str) -> bool: # Check for duplication transactions_id
         """ Double spend-prevention """
         if not tx_id:
