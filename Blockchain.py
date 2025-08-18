@@ -8,6 +8,7 @@ class Block:
         self.time_created = time_created 
         self.transactions = transactions
         self.previous_hash = previous_hash
+        self.hash = self.hash_block()
         self.nonce = nonce
 
     def to_dict(self):
@@ -18,7 +19,17 @@ class Block:
             "proof": self.proof,
             "previous_hash": self.previous_hash,
         }
-        
+    
+    def hash_block(self):
+               return {
+            "index": self.index,
+            "timestamp": self.timestamp,
+            "transactions": self.transactions,
+            "proof": self.proof,
+            "previous_hash": self.previous_hash,
+            "hash": self.hash
+        }
+
 class Transactions:
     """
     User transactions amount
@@ -47,11 +58,17 @@ class Blockchain:
     def __init__(self):
         self.chain = []
         self.pending_transactions = []
+        self.difficulty =3 
 
-        # 🔹 Create Genesis Block with funded accounts
+        # Populate the block
         genesis_txs = [
-            {"id": "genesis1", "sender": "SYSTEM", "receiver": "Alice", "amount": 100},
-            {"id": "genesis2", "sender": "SYSTEM", "receiver": "Bob", "amount": 50},
+            {"id": "tx000", "sender": "ADMIN", "receiver": "Alice", "amount": 1000},
+            {"id": "tx0001", "sender": "ADMIN", "receiver": "Jeff", "amount": 1000},
+            {"id": "tx0002", "sender": "ADMIN", "receiver": "Carl", "amount": 1000},
+            {"id": "tx0003", "sender": "ADMIN", "receiver": "Edward", "amount": 1000},
+            {"id": "tx0004", "sender": "ADMIN", "receiver": "Kate", "amount": 1000},
+            {"id": "tx0005", "sender": "ADMIN", "receiver": "Joe", "amount": 1000},
+            {"id": "tx0006", "sender": "ADMIN", "receiver": "John", "amount": 1000},
         ]
         self.create_block(
             data="Genesis Block",
@@ -83,20 +100,20 @@ class Blockchain:
         check_proof = False
 
         while not check_proof:
-            # print(new_proof)  # optional: uncomment to watch mining progress
-            to_digest = self.to_digest(
-                new_proof=new_proof,
-                previous_proof=previous_proof,
-                index=index,
-                data=data,
-            )
+            to_digest = self.to_digest(new_proof, previous_proof, index, data)
             hash_value = hashlib.sha256(to_digest).hexdigest()
-            if hash_value[:4] == "0000":  # Bigger the value the more time it will take to find this proof
+            if hash_value[:self.difficulty] == "0" * self.difficulty:
                 check_proof = True
             else:
                 new_proof += 1
         return new_proof
-
+    
+    def difficulty_adjustment(self):
+        if len(self.chain) %  5 ==0:
+            self.difficulty += 1
+        elif self.difficulty > 1 and len(self.chain) & 7 == 0:
+            self.difficulty -= 1
+    
     # Hash value
     def hash_value(self, block):
         """_summary_
@@ -107,18 +124,38 @@ class Blockchain:
         Returns:
             _type_: _description_
         """
-        encoded_block = json.dumps(block, sort_keys=True).encode()
+        block_copy = dict(block)
+        block_copy.pop("hash", None)
+
+        encoded_block = json.dumps(block_copy, sort_keys=True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
               
     # ---- Block ----
-    def mine_block(self, data: str) -> dict:
+    def mine_block(self, data: str, miner: str) -> dict:
+        reward_tx = {
+            "id": f"reward_{len(self.chain)+1}",  # unique reward ID
+            "sender": "SYSTEM",
+            "receiver": miner,
+            "amount": 10,  # reward amount
+        }
+        self.pending_transactions.append(reward_tx)
+
+        # Get previous block
         previous_block = self.get_previous_block()
         previous_proof = previous_block["proof"]
-        index = previous_block["index"] + 1      # <-- was len(self.chain) + 1
+        index = previous_block["index"] + 1
         proof = self.proof_of_work(previous_proof, index, data)
         previous_hash = self.hash_value(previous_block)
-        block = self.create_block(data=data, proof=proof,
-                                previous_hash=previous_hash, index=index)
+
+        # Create the new block with reward + all pending transactions
+        block = self.create_block(
+            data=data,
+            proof=proof,
+            previous_hash=previous_hash,
+            index=index
+        )
+        
+        self.difficulty_adjustment()
         return block
     
     # Create block
@@ -131,6 +168,7 @@ class Blockchain:
             "proof": proof,
             "previous_hash": previous_hash,
         }
+        block["hash"] = self.hash_value(block)
         self.pending_transactions = []  # clear the pool after mining
         self.chain.append(block)
         return block
@@ -158,8 +196,10 @@ class Blockchain:
             )
             hash_value = hashlib.sha256(self.to_digest(new_proof=next_proof, previous_proof=current_proof, 
                                                        index = next_index, data = next_data)).hexdigest()
-            if hash_value[:4] != "0000":
-                return False
+            
+            if hash_value[:self.difficulty] != "0" * self.difficulty:
+                        return False
+
             
             previous_block = block
             block_index +=1

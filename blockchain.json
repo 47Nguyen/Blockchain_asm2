@@ -1,38 +1,70 @@
 [
     {
         "index": 0,
-        "timestamp": "2025-08-16 19:01:35.129354",
+        "timestamp": "2025-08-18 17:08:33.388763",
         "data": "Genesis Block",
         "transactions": [
             {
-                "id": "genesis1",
-                "sender": "SYSTEM",
+                "id": "tx000",
+                "sender": "ADMIN",
                 "receiver": "Alice",
-                "amount": 100
+                "amount": 1000
             },
             {
-                "id": "genesis2",
-                "sender": "SYSTEM",
-                "receiver": "Bob",
-                "amount": 50
+                "id": "tx0001",
+                "sender": "ADMIN",
+                "receiver": "Jeff",
+                "amount": 1000
+            },
+            {
+                "id": "tx0002",
+                "sender": "ADMIN",
+                "receiver": "Carl",
+                "amount": 1000
+            },
+            {
+                "id": "tx0003",
+                "sender": "ADMIN",
+                "receiver": "Edward",
+                "amount": 1000
+            },
+            {
+                "id": "tx0004",
+                "sender": "ADMIN",
+                "receiver": "Kate",
+                "amount": 1000
+            },
+            {
+                "id": "tx0005",
+                "sender": "ADMIN",
+                "receiver": "Joe",
+                "amount": 1000
+            },
+            {
+                "id": "tx0006",
+                "sender": "ADMIN",
+                "receiver": "John",
+                "amount": 1000
             }
         ],
         "proof": 1,
-        "previous_hash": "0"
+        "previous_hash": "0",
+        "hash": "14a8dc22911f5bea94390145d5e776bb990042c0d9a88662e4d2bbae495e1bca"
     },
     {
         "index": 1,
-        "timestamp": "2025-08-16 19:01:54.221429",
-        "data": "1st block",
+        "timestamp": "2025-08-18 17:11:54.962507",
+        "data": "Mining for money",
         "transactions": [
             {
-                "id": "tx001",
-                "sender": "Alice",
-                "receiver": "Bob",
-                "amount": 100.0
+                "id": "reward_2",
+                "sender": "SYSTEM",
+                "receiver": "Alice",
+                "amount": 10
             }
         ],
-        "proof": 4927,
-        "previous_hash": "839362108b4b4d00f7c31345297fa8cf2e032785cd9ab3b456d4abe7a0328aa9"
+        "proof": 96,
+        "previous_hash": "4e884d816a019e49eda49c746a787ac5b01636da898784fb61b950f3e406567b",
+        "hash": "7a6dac5f3e9a65e8bb79d354aae45ddb25d48d819f85ea46b7eeb42379efaf2d"
     }
 ]

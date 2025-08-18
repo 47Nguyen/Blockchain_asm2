@@ -17,7 +17,7 @@ How to run:
     - pip install -r requirements.txt 
 - After installing successfully.
 - To run:
-    - Go to terminal and paste in uvicorn main:app --reload 
+    - Go to terminal and paste in "uvicorn main:app --reload" 
     - It will take a few seconds to run, then this will show up http://127.0.0.1:8000/docs. 
     - Copy and paste the link on to your browsers or you can  click the link (don't worry the link is safe!!). 
     - Note: uvicorn must be running in order for you to access the link and test out the features.

@@ -27,12 +27,7 @@ class GetTransactions(BaseModel):
     receiver: str
     amount: float
 
-
-@app.get("/")
-def read_me():
-    return "Please take a look at the README file."
-
-# Get all block
+# Get all block chain
 @app.get("/blockchain")
 def get_blockchain_data():
     if not blockchain.is_chain_valid():
@@ -54,18 +49,19 @@ def get_blockchain_data(index: int):
     return blockchain.chain[index]
 
 
-# Mining
+# Mine block
 @app.post('/mine_block/')
-def mine_block(data:str):
+def mine_block(data: str, miner: str):
     if not blockchain.is_chain_valid():
-        return _fastapi.HTTPException(status_code = 400, 
-                                      detail = "Invalid Block")
-    block = blockchain.mine_block(data = data)
-    return block    
+        raise HTTPException(status_code=400, detail="Invalid Block")
+    
+    block = blockchain.mine_block(data=data, miner=miner)
+    return {"message": f"Block mined by {miner}!", "block": block}
 
 
 # Transactions
-@app.post("/create_transactions_form") #Ai to debug
+#Create transaction
+@app.post("/create_transactions") #Ai to debug
 def create_transactions_form(
     id: str = Form(..., description="Transaction ID, e.g. tx001"),
     sender: str = Form(..., description="Sender name, e.g. Alice"),
@@ -88,14 +84,26 @@ def create_transactions_form(
         "size": len(getattr(blockchain, "pending_transactions", [])),   
     }
 
-
-@app.post("/pending_transactions")
+# Get pending transactions
+@app.get("/pending_transactions")
 def get_pending_transactions():
      return {
         "pending_transactions": getattr(blockchain, "pending_transactions", []),
         "count": len(getattr(blockchain, "pending_transactions", [])),
     }
 
+# Get balance of user
+@app.get("/balance/{user}")
+def get_balance(user: str):
+    if not user:
+        raise HTTPException(status_code=400, detail="No user")
+    
+    balance = blockchain.get_balance(user)
+    return {"user": user, "balance": balance}
+
+
+
+# Data persistence
 @app.post("/save")
 def save_chain():
     try:
