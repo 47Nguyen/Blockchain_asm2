@@ -1,7 +1,7 @@
 [
     {
         "index": 0,
-        "timestamp": "2025-08-18 17:08:33.388763",
+        "timestamp": "2025-08-19 15:46:15.143648",
         "data": "Genesis Block",
         "transactions": [
             {
@@ -49,22 +49,98 @@
         ],
         "proof": 1,
         "previous_hash": "0",
-        "hash": "14a8dc22911f5bea94390145d5e776bb990042c0d9a88662e4d2bbae495e1bca"
+        "hash": "1dc42e416ca1c7cdd23df33eaecd80312c6bb8f926a20a8cb07fbce80c884720"
     },
     {
         "index": 1,
-        "timestamp": "2025-08-18 17:11:54.962507",
-        "data": "Mining for money",
+        "timestamp": "2025-08-19 15:48:36.001548",
+        "data": "Mine 2",
         "transactions": [
             {
                 "id": "reward_2",
+                "sender": "SYSTEM",
+                "receiver": "Bob",
+                "amount": 10
+            }
+        ],
+        "proof": 1162,
+        "previous_hash": "be9d5f77a8cb719c0d4d8e268bee340a0535c07b80ee3a76291aeb3324aef9cc",
+        "hash": "0e429c07a4bf8b15df6d0a355e7509d0c542889530967c31aa11242acf73da43"
+    },
+    {
+        "index": 2,
+        "timestamp": "2025-08-19 15:48:40.670886",
+        "data": "Mine 3",
+        "transactions": [
+            {
+                "id": "reward_3",
                 "sender": "SYSTEM",
                 "receiver": "Alice",
                 "amount": 10
             }
         ],
-        "proof": 96,
-        "previous_hash": "4e884d816a019e49eda49c746a787ac5b01636da898784fb61b950f3e406567b",
-        "hash": "7a6dac5f3e9a65e8bb79d354aae45ddb25d48d819f85ea46b7eeb42379efaf2d"
+        "proof": 7421,
+        "previous_hash": "0e429c07a4bf8b15df6d0a355e7509d0c542889530967c31aa11242acf73da43",
+        "hash": "19f7fdfe719b3c007b93720a0ebdfd299856884cff5940efddd23cf7158070f1"
+    },
+    {
+        "index": 3,
+        "timestamp": "2025-08-19 15:48:50.887887",
+        "data": "Mine 4 ",
+        "transactions": [
+            {
+                "id": "reward_4",
+                "sender": "SYSTEM",
+                "receiver": "John",
+                "amount": 10
+            }
+        ],
+        "proof": 2567,
+        "previous_hash": "19f7fdfe719b3c007b93720a0ebdfd299856884cff5940efddd23cf7158070f1",
+        "hash": "bcaa941773566902fb255e05e5066199daea5ce3fa5581734cf5d7b9c933f873"
+    },
+    {
+        "index": 4,
+        "timestamp": "2025-08-19 15:49:59.777608",
+        "data": "Mine 5",
+        "transactions": [
+            {
+                "id": "tx007",
+                "sender": "Alice",
+                "receiver": "Bob",
+                "amount": 150.0
+            },
+            {
+                "id": "reward_5",
+                "sender": "SYSTEM",
+                "receiver": "Alice",
+                "amount": 10
+            }
+        ],
+        "proof": 1511,
+        "previous_hash": "bcaa941773566902fb255e05e5066199daea5ce3fa5581734cf5d7b9c933f873",
+        "hash": "314272b5b2b901f9aa1bf8a417430bee8009b4b1c5cb35a62ca074e056be7324"
+    },
+    {
+        "index": 5,
+        "timestamp": "2025-08-19 15:51:50.798558",
+        "data": "Mine 8 ",
+        "transactions": [
+            {
+                "id": "tx008",
+                "sender": "Alice",
+                "receiver": "Bob",
+                "amount": 20.0
+            },
+            {
+                "id": "reward_6",
+                "sender": "SYSTEM",
+                "receiver": "Bob",
+                "amount": 10
+            }
+        ],
+        "proof": 1869,
+        "previous_hash": "314272b5b2b901f9aa1bf8a417430bee8009b4b1c5cb35a62ca074e056be7324",
+        "hash": "6f069e862d7b6fa2f9244f988c907d58774d1b66f4940e717b401599f535990f"
     }
 ]
