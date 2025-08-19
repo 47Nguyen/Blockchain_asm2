@@ -4,6 +4,15 @@ import json
 
 class Block:
     def __init__(self, block_index, time_created, transactions, previous_hash, nonce):
+        """_summary_
+
+        Args:
+            block_index (_type_): _description_
+            time_created (_type_): _description_
+            transactions (_type_): _description_
+            previous_hash (_type_): _description_
+            nonce (_type_): _description_
+        """
         self.block_index = block_index
         self.time_created = time_created 
         self.transactions = transactions
@@ -12,6 +21,11 @@ class Block:
         self.nonce = nonce
 
     def to_dict(self):
+        """_summary_
+
+        Returns:
+            _type_: _description_
+        """
         return {
             "index": self.index,
             "timestamp": self.timestamp,
@@ -20,21 +34,17 @@ class Block:
             "previous_hash": self.previous_hash,
         }
     
-    def hash_block(self):
-               return {
-            "index": self.index,
-            "timestamp": self.timestamp,
-            "transactions": self.transactions,
-            "proof": self.proof,
-            "previous_hash": self.previous_hash,
-            "hash": self.hash
-        }
 
 class Transactions:
-    """
-    User transactions amount
-    """
     def __init__(self, transaction_id, sender, receiver, amount):
+        """_summary_
+
+        Args:
+            transaction_id (_type_): _description_
+            sender (_type_): _description_
+            receiver (_type_): _description_
+            amount (_type_): _description_
+        """
         self.ids = transaction_id
         self.sender = sender
         self.receiver = receiver
@@ -56,10 +66,11 @@ class Transactions:
 class Blockchain: 
     # This class will store data which a normal blockchain should have
     def __init__(self):
+
         self.chain = []
         self.pending_transactions = []
         self.difficulty =3 
-
+        
         # Populate the block
         genesis_txs = [
             {"id": "tx000", "sender": "ADMIN", "receiver": "Alice", "amount": 1000},
@@ -80,22 +91,32 @@ class Blockchain:
         self.chain[0]["transactions"] = genesis_txs
 
     def to_digest(self, new_proof: int, previous_proof: int, index: str, data: str) -> bytes:
-        """
+        """_summary_
+
         Args:
-            new_proof (int): _description_``
+            new_proof (int): _description_
             previous_proof (int): _description_
             index (str): _description_
             data (str): _description_
+
         Returns:
             bytes: _description_
-            
-        to_digst: takes input data and use a hash function sha256 to produce a string of bytes
         """
         to_digest = str(new_proof ** 2 - previous_proof **2 + index) + data
         return to_digest.encode()
     
     # Proof of work
     def proof_of_work(self, previous_proof: int, index: int, data: str) -> int:
+        """_summary_
+
+        Args:
+            previous_proof (int): _description_
+            index (int): _description_
+            data (str): _description_
+
+        Returns:
+            int: _description_
+        """
         new_proof = 1
         check_proof = False
 
@@ -109,6 +130,7 @@ class Blockchain:
         return new_proof
     
     def difficulty_adjustment(self):
+
         if len(self.chain) %  5 ==0:
             self.difficulty += 1
         elif self.difficulty > 1 and len(self.chain) & 7 == 0:
@@ -131,7 +153,29 @@ class Blockchain:
         return hashlib.sha256(encoded_block).hexdigest()
               
     # ---- Block ----
-    def mine_block(self, data: str, miner: str) -> dict:
+    def mine_block(self, data: str, miner: str) -> dict: 
+        """_summary_
+
+        Args:
+            data (str): _description_
+            miner (str): _description_
+
+        Returns:
+            dict: _description_
+            
+        In a real mining situation the attempts can take up to thousands and millions of attempts.
+        However, it is probabillistic and can vary. 
+        """
+        
+        #1. Get previous block
+        previous_block = self.get_previous_block()
+        previous_proof = previous_block["proof"]
+        index = previous_block["index"] + 1
+        
+        # 2. Find valid proof
+        proof = self.proof_of_work(previous_proof, index, data)
+        
+        # 3. When proof is found reward user 
         reward_tx = {
             "id": f"reward_{len(self.chain)+1}",  # unique reward ID
             "sender": "SYSTEM",
@@ -140,14 +184,10 @@ class Blockchain:
         }
         self.pending_transactions.append(reward_tx)
 
-        # Get previous block
-        previous_block = self.get_previous_block()
-        previous_proof = previous_block["proof"]
-        index = previous_block["index"] + 1
-        proof = self.proof_of_work(previous_proof, index, data)
+        # 4, Link preivous hash
         previous_hash = self.hash_value(previous_block)
 
-        # Create the new block with reward + all pending transactions
+        # 5.Create the new block with reward + all pending transactions
         block = self.create_block(
             data=data,
             proof=proof,
@@ -155,11 +195,23 @@ class Blockchain:
             index=index
         )
         
+        # Set difficulty
         self.difficulty_adjustment()
         return block
     
     # Create block
     def create_block(self, data: str, proof: int, previous_hash: str, index: int) -> dict:
+        """_summary_
+
+        Args:
+            data (str): _description_
+            proof (int): _description_
+            previous_hash (str): _description_
+            index (int): _description_
+
+        Returns:
+            dict: _description_
+        """
         block = {
             "index": index,
             "timestamp": str(datetime.datetime.now()),
@@ -175,11 +227,20 @@ class Blockchain:
     
     # Get previous block
     def get_previous_block(self) -> dict:
+        """_summary_
+
+        Returns:
+            dict: _description_
+        """
         return self.chain[-1] 
     
     # Chain integreity 
     def is_chain_valid(self) -> bool: ## Job is to make sure that the chain is still valid and no alteration been made
-        """  """
+        """_summary_
+
+        Returns:
+            bool: _description_
+        """
         previous_block = self.chain[0]
         block_index = 1
 
@@ -209,16 +270,28 @@ class Blockchain:
     # ---- DATA PERSISTENCE ----
     # Save Blockchain
     def save_chain(self):
+        """_summary_
+        """
         with open("blockchain.json", "w") as f:
             json.dump(self.chain, f , indent=4)
 
     # Load block chain
     def load_chain(self):
-         with open("blockchain.json", "r") as f:
+        """_summary_
+        """
+        with open("blockchain.json", "r") as f:
              self.chain = json.load(f)
 
     # ---- TRANSACTIONS ----
     def get_balance(self, user: str) -> float:
+        """_summary_
+
+        Args:
+            user (str): _description_
+
+        Returns:
+            float: _description_
+        """
         balance = 0.0
 
         # Confirmed transactions
@@ -247,7 +320,14 @@ class Blockchain:
         return balance
 
     def check_transactions(self, tx_id: str) -> bool: # Check for duplication transactions_id
-        """ Double spend-prevention """
+        """_summary_
+
+        Args:
+            tx_id (str): _description_
+
+        Returns:
+            bool: _description_
+        """
         if not tx_id:
             return False # No tx exists
         
@@ -260,10 +340,23 @@ class Blockchain:
                     return True
         return False
     
-    def _tx_exists(self, tx_id: str) -> bool:
+    def exists_transactions(self, tx_id: str) -> bool:
+        """_summary_
+
+        Args:
+            tx_id (str): _description_
+
+        Returns:
+            bool: _description_
+        """
         return self.check_transactions(tx_id)
 
-    def insert_transaction(self, transaction: Transactions) -> bool: # Use AI
+    def insert_transaction(self, transaction: Transactions) -> bool: 
+        """_summary_
+
+        Returns:
+            _type_: _description_
+        """
         if not isinstance(transaction, Transactions):
             return False
 
@@ -272,7 +365,7 @@ class Blockchain:
         if not self.validate_transaction(tx):
             return False
 
-        if self._tx_exists(tx["id"]):
+        if self.exists_transactions(tx["id"]):
             return False
 
         self.pending_transactions.append(tx)
@@ -280,6 +373,14 @@ class Blockchain:
         return True
 
     def validate_transaction(self, tx: dict) -> bool:
+        """_summary_
+
+        Args:
+            tx (dict): _description_
+
+        Returns:
+            bool: _description_
+        """
         sender = tx.get("sender")
         receiver = tx.get("receiver")
         amount = tx.get("amount")
