@@ -34,16 +34,16 @@ class Block:
             "previous_hash": self.previous_hash,
         }
     
-
 class Transactions:
     def __init__(self, transaction_id, sender, receiver, amount):
-        """_summary_
+        """
+        Initialize new tranasctions
 
         Args:
-            transaction_id (_type_): _description_
-            sender (_type_): _description_
-            receiver (_type_): _description_
-            amount (_type_): _description_
+            transaction_id (_type_): Unique ID for transactions
+            sender (_type_):  The user or system creating/sending the transaction.
+            receiver (_type_): User receviing the transactions
+            amount (_type_): Amount sent
         """
         self.ids = transaction_id
         self.sender = sender
@@ -51,10 +51,10 @@ class Transactions:
         self.amount = amount
     
     def to_dict(self):
-        """_summary_
+        """
 
         Returns:
-            _type_: _description_
+            _type_: Return Dictionary of Transaction
         """
         return {
             "id": self.ids,
@@ -69,7 +69,7 @@ class Blockchain:
 
         self.chain = []
         self.pending_transactions = []
-        self.difficulty =3 
+        self.difficulty =3 # Defaulty difficulty
         
         # Populate the block
         genesis_txs = [
@@ -81,42 +81,57 @@ class Blockchain:
             {"id": "tx0005", "sender": "ADMIN", "receiver": "Joe", "amount": 1000},
             {"id": "tx0006", "sender": "ADMIN", "receiver": "John", "amount": 1000},
         ]
+        # In a real block chain, the sender, and receiver will be a form of the wallet address not name
         self.create_block(
             data="Genesis Block",
             proof=1,
             previous_hash="0",
             index=0,
         )
+        
         # Store genesis transactions inside the first block
         self.chain[0]["transactions"] = genesis_txs
 
     def to_digest(self, new_proof: int, previous_proof: int, index: str, data: str) -> bytes:
-        """_summary_
+        """
+        Its job is to hashed the inputted string and it will results
+        in unique string of bytes -> for miner to solve
 
         Args:
-            new_proof (int): _description_
-            previous_proof (int): _description_
-            index (str): _description_
-            data (str): _description_
+            new_proof (int): new proof from the new block
+            previous_proof (int): Proof from previous block
+            index (str): index of a block
+            data (str): the data of the block
 
         Returns:
-            bytes: _description_
+            bytes: Hashed value of inputted string
         """
+        #
+        
         to_digest = str(new_proof ** 2 - previous_proof **2 + index) + data
         return to_digest.encode()
     
     # Proof of work
     def proof_of_work(self, previous_proof: int, index: int, data: str) -> int:
-        """_summary_
+        """
+        Perform the Proof-of-Work (PoW) algorithm to find a valid proof (nonce) 
+        for the next block in the blockchain.
+
+        The function repeatedly tests different values of `new_proof` until it 
+        finds one that produces a SHA-256 hash with the required number of leading 
+        zeros (difficulty target). This ensures that miners must expend 
+        computational effort to create a valid block, securing the blockchain 
+        against tampering.
 
         Args:
-            previous_proof (int): _description_
-            index (int): _description_
-            data (str): _description_
+            previous_proof (int):Proof from previous block
+            index (int): index of a block
+            data (str): the data of the block
 
         Returns:
-            int: _description_
+            int: The valid proof (nonce) that satisfies the difficulty condition.
         """
+        
         new_proof = 1
         check_proof = False
 
@@ -138,13 +153,14 @@ class Blockchain:
     
     # Hash value
     def hash_value(self, block):
-        """_summary_
+        """
+        Hash block using SHA-256
 
         Args:
-            block (_type_): _description_
+            block (_type_): Block that is used tobe hashed
 
         Returns:
-            _type_: _description_
+            _type_:  The SHA-256 value of the hashed blocked
         """
         block_copy = dict(block)
         block_copy.pop("hash", None)
@@ -154,17 +170,24 @@ class Blockchain:
               
     # ---- Block ----
     def mine_block(self, data: str, miner: str) -> dict: 
-        """_summary_
+        """
+        Mine a new block and add it into the blockchain.
 
         Args:
-            data (str): _description_
-            miner (str): _description_
+            data (str): Data to include in the block
+            miner (str): User that mine the block
 
         Returns:
-            dict: _description_
+            dict: Dictionary of the created block
             
-        In a real mining situation the attempts can take up to thousands and millions of attempts.
-        However, it is probabillistic and can vary. 
+        - Proof-of-Work is a probabilistic process and may require 
+          thousands or millions of attempts before a valid proof 
+          is found.
+        - A mining reward transaction is automatically created and 
+          assigned to the miner.
+        - Pending transactions are cleared after being added to 
+          the block.
+          
         """
         
         #1. Get previous block
@@ -201,16 +224,16 @@ class Blockchain:
     
     # Create block
     def create_block(self, data: str, proof: int, previous_hash: str, index: int) -> dict:
-        """_summary_
+        """Create a block within the blockchain
 
         Args:
-            data (str): _description_
-            proof (int): _description_
-            previous_hash (str): _description_
-            index (int): _description_
+            data (str): Data that is included in the block
+            proof (int): The valid proof found when mining
+            previous_hash (str): Hash value of the previous block
+            index (int): Index of a block 
 
         Returns:
-            dict: _description_
+            dict: Dictionary of the newly created block
         """
         block = {
             "index": index,
@@ -227,19 +250,21 @@ class Blockchain:
     
     # Get previous block
     def get_previous_block(self) -> dict:
-        """_summary_
+        """
+        Return the dictionary of a previous block
 
         Returns:
-            dict: _description_
+            dict: Dictionary of the previous block
         """
         return self.chain[-1] 
     
     # Chain integreity 
-    def is_chain_valid(self) -> bool: ## Job is to make sure that the chain is still valid and no alteration been made
-        """_summary_
+    def is_chain_valid(self) -> bool: 
+        """
+        Ensure that the chain is still valid and no alteration been made
 
         Returns:
-            bool: _description_
+            bool: If the chain is valid, return true else false
         """
         previous_block = self.chain[0]
         block_index = 1
@@ -270,27 +295,29 @@ class Blockchain:
     # ---- DATA PERSISTENCE ----
     # Save Blockchain
     def save_chain(self):
-        """_summary_
+        """
+        Save chain in a form of json file when newly blocks has been added into the chain.
         """
         with open("blockchain.json", "w") as f:
             json.dump(self.chain, f , indent=4)
 
     # Load block chain
     def load_chain(self):
-        """_summary_
+        """
+        Load chain from json file
         """
         with open("blockchain.json", "r") as f:
              self.chain = json.load(f)
 
     # ---- TRANSACTIONS ----
     def get_balance(self, user: str) -> float:
-        """_summary_
+        """
+        A helper functions to get user's balance
 
         Args:
-            user (str): _description_
-
+            user (str): Input user name
         Returns:
-            float: _description_
+            float: Return the balance number of in
         """
         balance = 0.0
 
@@ -319,14 +346,16 @@ class Blockchain:
 
         return balance
 
-    def check_transactions(self, tx_id: str) -> bool: # Check for duplication transactions_id
-        """_summary_
+    def check_transactions(self, tx_id: str) -> bool: # 
+        """
+        Check for duplication transactions_id so that only 1 transactions id can exists
+        Used to prevent double spending 
 
         Args:
-            tx_id (str): _description_
+            tx_id (str): Inputted transactions to check
 
         Returns:
-            bool: _description_
+            bool: If transactions id exists true, else if not exist yet false.
         """
         if not tx_id:
             return False # No tx exists
@@ -352,10 +381,13 @@ class Blockchain:
         return self.check_transactions(tx_id)
 
     def insert_transaction(self, transaction: Transactions) -> bool: 
-        """_summary_
-
+        """
+        Insert transactions new transactions. 
+        The newly inserted transactions won't be confirmed yet.
+        It will only be confired when someone successfully mined a block.
+        
         Returns:
-            _type_: _description_
+            _type_: True if insert transactions succesfully, if fail to insert false
         """
         if not isinstance(transaction, Transactions):
             return False
@@ -373,13 +405,14 @@ class Blockchain:
         return True
 
     def validate_transaction(self, tx: dict) -> bool:
-        """_summary_
+        """
+        Validate transaction before adding
 
         Args:
-            tx (dict): _description_
+            tx (dict): Dictionary format of the transaction
 
         Returns:
-            bool: _description_
+            bool: Return true if transaction is valid, if not false.
         """
         sender = tx.get("sender")
         receiver = tx.get("receiver")

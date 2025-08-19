@@ -8,6 +8,9 @@ from Blockchain import Transactions
 import Blockchain as blockchain
 
 #Set up
+""" 
+The setup here means that the setup can be 
+"""
 blockchain = blockchain.Blockchain()
 app = _fastapi.FastAPI()
 app.add_middleware(
@@ -27,6 +30,7 @@ class GetTransactions(BaseModel):
     receiver: str
     amount: float
 
+# --- End point ---
 # Get all block chain
 @app.get("/blockchain")
 def get_blockchain_data():
