@@ -148,6 +148,7 @@ class Blockchain:
     
     def difficulty_adjustment(self):
         old_difficulty = self.difficulty
+        
         if len(self.chain) %  5 ==0:
             self.difficulty += 1
         elif self.difficulty > 1 and len(self.chain) & 7 == 0:
@@ -196,19 +197,17 @@ class Blockchain:
           the block.
           
         """
-        # Set difficulty
-        print(f"Difficulty start at {self.difficulty}...")
-        self.difficulty_adjustment()
+        print(f"Current difficulty {self.difficulty}...")
         
-        #1. Get previous block
+        #Get previous block
         previous_block = self.get_previous_block()
         previous_proof = previous_block["proof"]
         index = previous_block["index"] + 1
         
-        # 2. Find valid proof
+        #Find valid proof
         proof = self.proof_of_work(previous_proof, index, data)
         
-        # 3. When proof is found reward user 
+        #When proof is found reward user 
         reward_tx = {
             "id": f"reward_{len(self.chain)+1}",  # unique reward ID
             "sender": "SYSTEM",
@@ -217,10 +216,10 @@ class Blockchain:
         }
         self.pending_transactions.append(reward_tx)
 
-        # 4, Link preivous hash
+        #Link preivous hash
         previous_hash = self.hash_value(previous_block)
 
-        # 5.Create the new block with reward + all pending transactions
+        # Create the new block with reward + all pending transactions
         block = self.create_block(
             data=data,
             proof=proof,
@@ -228,8 +227,9 @@ class Blockchain:
             index=index
         )
         
- 
-    
+        # Adjust difficulty
+        self.difficulty_adjustment()
+
         print(f"Block mined at difficulty {self.difficulty}. Nonce: {proof}, Hash: {block['hash']}")
         return block
     
@@ -282,11 +282,9 @@ class Blockchain:
         while block_index < len(self.chain):
             block = self.chain[block_index]
 
-            # 1. Verify chain linkage
             if block['previous_hash'] != self.hash_value(previous_block):
                 return False
 
-            # 2. Validate Proof of Work with this block's difficulty
             current_proof = previous_block['proof']
             next_index, next_data, next_proof = (
                 block["index"],
@@ -294,7 +292,7 @@ class Blockchain:
                 block["proof"],
             )
 
-            # 🔑 Use the same PoW formula used during mining
+
             hash_value = hashlib.sha256(self.to_digest(
                 new_proof=next_proof,
                 previous_proof=current_proof,
