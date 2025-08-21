@@ -146,6 +146,7 @@ class Blockchain:
             # Increment nonce
             new_proof += 1
     
+    #Adjust difficulty of mining
     def difficulty_adjustment(self):
         old_difficulty = self.difficulty
         
@@ -363,6 +364,7 @@ class Blockchain:
 
         return balance
 
+    #Check transactions
     def check_transactions(self, tx_id: str) -> bool: # 
         """
         Check for duplication transactions_id so that only 1 transactions id can exists
@@ -398,6 +400,7 @@ class Blockchain:
         """
         return self.check_transactions(tx_id)
 
+    #Insert Transactions
     def insert_transaction(self, transaction: Transactions) -> bool: 
         """
         Insert transactions new transactions. 
@@ -422,6 +425,7 @@ class Blockchain:
 
         return True
 
+    #Validate transactions
     def validate_transaction(self, tx: dict) -> bool:
         """
         Validate transaction before adding
