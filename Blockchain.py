@@ -7,11 +7,11 @@ class Block:
         """_summary_
 
         Args:
-            block_index (_type_): _description_
-            time_created (_type_): _description_
-            transactions (_type_): _description_
-            previous_hash (_type_): _description_
-            nonce (_type_): _description_
+            block_index (_type_):  Index of the block
+            time_created (_type_): Timestamp of block create
+            transactions (_type_): Lists of transactions
+            previous_hash (_type_): Hash value from the previous blockj
+            nonce (_type_): The proof-of-work nonce that produced a valid block hash.
         """
         self.block_index = block_index
         self.time_created = time_created 
@@ -20,11 +20,9 @@ class Block:
         self.hash = self.hash_block()
         self.nonce = nonce
 
-    def to_dict(self):
-        """_summary_
-
-        Returns:
-            _type_: _description_
+    def to_dict(self) -> dict:
+        """
+        Return a serialize dictionary of block object
         """
         return {
             "index": self.index,
@@ -52,9 +50,8 @@ class Transactions:
     
     def to_dict(self):
         """
+        Return a serializable dictionary of Transaction
 
-        Returns:
-            _type_: Return Dictionary of Transaction
         """
         return {
             "id": self.ids,
@@ -100,8 +97,8 @@ class Blockchain:
         Args:
             new_proof (int): new proof from the new block
             previous_proof (int): Proof from previous block
-            index (str): index of a block
-            data (str): the data of the block
+            index (str): Index of a block
+            data (str): The data of the block
 
         Returns:
             bytes: Hashed value of inputted string
@@ -125,8 +122,8 @@ class Blockchain:
 
         Args:
             previous_proof (int):Proof from previous block
-            index (int): index of a block
-            data (str): the data of the block
+            index (int): Index of a block
+            data (str): The data of the block
 
         Returns:
             int: The valid proof (nonce) that satisfies the difficulty condition.
@@ -370,13 +367,14 @@ class Blockchain:
         return False
     
     def exists_transactions(self, tx_id: str) -> bool:
-        """_summary_
+        """
+        Check for exists transactions in block or pending transactions
 
         Args:
-            tx_id (str): _description_
+            tx_id (str): Transactions Id to check
 
         Returns:
-            bool: _description_
+            bool: Return True if transactions exists, else return Falase if don't exists
         """
         return self.check_transactions(tx_id)
 

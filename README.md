@@ -1,6 +1,6 @@
 # Blockchiain_assigment2
 Source: 
-Chat GPT
+Chat GPT 5. 
 https://www.geeksforgeeks.org/python/create-simple-blockchain-using-python
 https://www.youtube.com/watch?v=G5M4bsxR-7E
 https://www.youtube.com/watch?v=alNU9AVWkQk
@@ -18,4 +18,9 @@ How to run:
 
 How to test:
 - When you the link above. It will direct you to a page of all the feature.
-- At the bottom. Locate the /load. 
+- At the bottom. Click on the /load API endpoint, then on the left side click "Try it Out"
+    - Run the existing blockchain that I've created
+- After that you can try out all the different features.
+- Remember if you have made any changes such as adding new block or creating new transactions remember to save it 
+    - Use the /save endpoint. 
+    - Else if you rerun the API, without using the /save endpoint, no changes will be updated.

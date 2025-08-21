@@ -9,7 +9,7 @@ import Blockchain as blockchain
 
 #Set up
 """ 
-The setup here means that the setup can be 
+The setup here means that the setup can be access from any location and device
 """
 blockchain = blockchain.Blockchain()
 app = _fastapi.FastAPI()
@@ -45,7 +45,7 @@ def get_blockchain_data():
         "chain": blockchain.chain,
     }
     
-# Get single block by index
+# Get single block by block index
 @app.get('/blockchain/{index}')
 def get_blockchain_data(index: int):
     if index < 0 or index >= len(blockchain.chain):
@@ -63,15 +63,14 @@ def mine_block(data: str, miner: str):
     return {"message": f"Block mined by {miner}!", "block": block}
 
 
-# Transactions
+#-- Transactions -- 
 #Create transaction
 @app.post("/create_transactions") #Ai to debug
 def create_transactions_form(
     id: str = Form(..., description="Transaction ID, e.g. tx001"),
     sender: str = Form(..., description="Sender name, e.g. Alice"),
     receiver: str = Form(..., description="Receiver name, e.g. Bob"),
-    amount: float = Form(..., description="Amount, e.g. 100"),
-):
+    amount: float = Form(..., description="Amount, e.g. 100"),):
     trans = Transactions(
         transaction_id=id,
         sender=sender,
@@ -108,6 +107,7 @@ def get_balance(user: str):
 
 
 # Data persistence
+# Save block, whenevevr new block or transactions is added
 @app.post("/save")
 def save_chain():
     try:
@@ -116,6 +116,7 @@ def save_chain():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Load Json file
 @app.post("/load")
 def load_chain():
     try:
