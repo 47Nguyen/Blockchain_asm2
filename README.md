@@ -1,9 +1,10 @@
 # Blockchiain_assigment2
 Source: 
-Chat GPT 5. 
+Chat GPT 5 wre used a lot for debugging issues and generating ideas.
 https://www.geeksforgeeks.org/python/create-simple-blockchain-using-python
 https://www.youtube.com/watch?v=G5M4bsxR-7E
 https://www.youtube.com/watch?v=alNU9AVWkQk
+
 
 How to run:
 - You will need to install the require library for this. To do that copy and paste the text below into your terminal: 
