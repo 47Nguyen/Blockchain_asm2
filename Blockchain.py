@@ -131,12 +131,20 @@ class Blockchain:
         
         new_proof = 1
         check_proof = False
-
+        
+        print(f"Target Difficulty: {self.difficulty} (Hash must start with {'0'*self.difficulty})") #Automatically adjust diffculty
+        
         while not check_proof:
             to_digest = self.to_digest(new_proof, previous_proof, index, data)
             hash_value = hashlib.sha256(to_digest).hexdigest()
+
+            # Print the every nonce value
+            print(f"Nonce: {new_proof} -> Hash: {hash_value}")
+
             if hash_value[:self.difficulty] == "0" * self.difficulty:
                 check_proof = True
+                print(f"\ Nonce Found! Nonce = {new_proof}, Hash = {hash_value}\n")
+                
             else:
                 new_proof += 1
         return new_proof
@@ -239,6 +247,7 @@ class Blockchain:
             "transactions": self.pending_transactions.copy(),   # include txs here
             "proof": proof,
             "previous_hash": previous_hash,
+            "none": proof
         }
         block["hash"] = self.hash_value(block)
         self.pending_transactions = []  # clear the pool after mining
