@@ -66,7 +66,7 @@ class Blockchain:
 
         self.chain = []
         self.pending_transactions = []
-        self.difficulty =3 # Defaulty difficulty
+        self.difficulty =3 # Default difficulty
         
         # Populate the block
         genesis_txs = [
@@ -130,31 +130,33 @@ class Blockchain:
         """
         
         new_proof = 1
-        check_proof = False
-        
-        print(f"Target Difficulty: {self.difficulty} (Hash must start with {'0'*self.difficulty})") #Automatically adjust diffculty
-        
-        while not check_proof:
+        while True:
+            # Generate candidate hash
             to_digest = self.to_digest(new_proof, previous_proof, index, data)
             hash_value = hashlib.sha256(to_digest).hexdigest()
 
-            # Print the every nonce value
-            print(f"Nonce: {new_proof} -> Hash: {hash_value}")
+            # Show every nonce attempt
+            print(f"Nonce: {new_proof} -> Hash: {hash_value}") # Print all the nonce value till it finds correct nonce
 
-            if hash_value[:self.difficulty] == "0" * self.difficulty:
-                check_proof = True
-                print(f"\ Nonce Found! Nonce = {new_proof}, Hash = {hash_value}\n")
-                
-            else:
-                new_proof += 1
-        return new_proof
+            # Stop if hash meets difficulty requirement
+            if hash_value.startswith("0" * self.difficulty):
+                print(f"Valid nonce found: {new_proof} with hash {hash_value}")
+                return new_proof
+            
+            # Increment nonce
+            new_proof += 1
     
     def difficulty_adjustment(self):
-
+        old_difficulty = self.difficulty
         if len(self.chain) %  5 ==0:
             self.difficulty += 1
         elif self.difficulty > 1 and len(self.chain) & 7 == 0:
             self.difficulty -= 1
+            
+        if self.difficulty != old_difficulty:
+            print(f"Difficulty adjusted: {old_difficulty} -> {self.difficulty}")
+        else:
+            print(f"Difficulty remains at: {self.difficulty}")
     
     # Hash value
     def hash_value(self, block):
@@ -194,6 +196,9 @@ class Blockchain:
           the block.
           
         """
+        # Set difficulty
+        print(f"Difficulty start at {self.difficulty}...")
+        self.difficulty_adjustment()
         
         #1. Get previous block
         previous_block = self.get_previous_block()
@@ -223,8 +228,9 @@ class Blockchain:
             index=index
         )
         
-        # Set difficulty
-        self.difficulty_adjustment()
+ 
+    
+        print(f"Block mined at difficulty {self.difficulty}. Nonce: {proof}, Hash: {block['hash']}")
         return block
     
     # Create block
@@ -247,6 +253,7 @@ class Blockchain:
             "transactions": self.pending_transactions.copy(),   # include txs here
             "proof": proof,
             "previous_hash": previous_hash,
+            "difficulty": self.difficulty,
             "none": proof
         }
         block["hash"] = self.hash_value(block)
@@ -265,38 +272,44 @@ class Blockchain:
         return self.chain[-1] 
     
     # Chain integreity 
-    def is_chain_valid(self) -> bool: 
+    def is_chain_valid(self) -> bool:
         """
-        Ensure that the chain is still valid and no alteration been made
-
-        Returns:
-            bool: If the chain is valid, return true else false
+        Ensure that the chain is still valid and no alteration has been made.
         """
         previous_block = self.chain[0]
         block_index = 1
 
         while block_index < len(self.chain):
             block = self.chain[block_index]
+
+            # 1. Verify chain linkage
             if block['previous_hash'] != self.hash_value(previous_block):
                 return False
 
+            # 2. Validate Proof of Work with this block's difficulty
             current_proof = previous_block['proof']
-            next_index, next_data , next_proof = (
+            next_index, next_data, next_proof = (
                 block["index"],
                 block["data"],
                 block["proof"],
             )
-            hash_value = hashlib.sha256(self.to_digest(new_proof=next_proof, previous_proof=current_proof, 
-                                                       index = next_index, data = next_data)).hexdigest()
-            
-            if hash_value[:self.difficulty] != "0" * self.difficulty:
-                        return False
 
-            
+            # 🔑 Use the same PoW formula used during mining
+            hash_value = hashlib.sha256(self.to_digest(
+                new_proof=next_proof,
+                previous_proof=current_proof,
+                index=next_index,
+                data=next_data
+            )).hexdigest()
+
+            if not hash_value.startswith("0" * block["difficulty"]):
+                return False
+
             previous_block = block
-            block_index +=1
-        
-        return True 
+            block_index += 1
+
+        return True
+
               
     # ---- DATA PERSISTENCE ----
     # Save Blockchain
